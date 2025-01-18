@@ -6,6 +6,10 @@ MAKEFILE_PATH := $(shell readlink -f Makefile) ## Makefile absolute path.
 run: ## Run the 'main.py' file.
 	@python3 1brc/src/main.py
 
+.PHONY: profile
+profile: ## Run the 'main.py' file with a profiler (Scalene).
+	@python3 -m scalene 1brc/src/main.py
+
 .PHONY: test
 test: ## Run the 'main.py' file.
 	@python3 -m pytest 1brc/src/**.py
