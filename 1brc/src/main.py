@@ -4,7 +4,7 @@ from os import path
 from timeit import timeit
 
 
-def parse_weather_station_data() -> None:
+def parse_weather_station_data() -> None:  # as this, this function will take ~20 mins for 1 billion rows
     """This function holds all the logic we need."""
     filepath: str = str(path.dirname(path.abspath(__file__))) + "/data/weather_stations.csv"
     with open(file=filepath, mode="r", encoding="utf8") as filepointer:
