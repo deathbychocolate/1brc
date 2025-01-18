@@ -8,7 +8,7 @@ run: ## Run the 'main.py' file.
 
 .PHONY: test
 test: ## Run the 'main.py' file.
-	@python3 -m pytest 1brc/src/.py
+	@python3 -m pytest 1brc/src/**.py
 
 .PHONY: help
 help: ## Show help and exit.

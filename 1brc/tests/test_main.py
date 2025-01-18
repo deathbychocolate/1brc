@@ -7,7 +7,7 @@ import pytest
 
 class TestMain:
 
-    @pytest.fixture(scope=session)
+    @pytest.fixture(scope="session")
     def setup_teardown(self) -> Generator:
         yield ""
 
