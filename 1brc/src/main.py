@@ -1,6 +1,7 @@
 """The only file we will ever need."""
 
 from os import path
+from timeit import timeit
 
 
 def parse_weather_station_data() -> None:
@@ -48,7 +49,12 @@ def parse_weather_station_data() -> None:
 
 def main() -> None:
     """Call this function to run the program."""
-    parse_weather_station_data()
+    wall_time_in_seconds: float = timeit(
+        stmt="parse_weather_station_data()",
+        setup="from main import parse_weather_station_data",
+        number=100,  # times we call the function
+    )
+    print(f"Wall time in seconds: {wall_time_in_seconds}")
 
 
 if __name__ == "__main__":
