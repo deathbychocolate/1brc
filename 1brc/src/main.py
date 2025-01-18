@@ -3,31 +3,17 @@
 from os import path
 
 
-def minimum() -> float:
-    minimum: float = 0.0
-    return minimum
-
-
-def mean() -> float:
-    mean: float = 0.0
-    return mean
-
-
-def maximum() -> float:
-    maximum: float = 0.0
-    return maximum
-
-
 def parse_weather_station_data() -> None:
+    """This function holds all the logic we need."""
     filepath: str = str(path.dirname(path.abspath(__file__))) + "/data/weather_stations.csv"
     with open(file=filepath, mode="r", encoding="utf8") as filepointer:
         rows: list[str] = filepointer.read().splitlines()
         rows = sorted(rows)  # sort with O(nlog(n)) algorithm
 
-        # Construct a dictionary 'weather_station_data' so that wwe group all temps together by city.
+        # Construct a dictionary 'weather_station_data' so that we group all temps together by city.
         # The city name is the key, the value is a list of floats.
         # Do all conversions needed.
-        weather_station_data: dict[str, list[float]] = dict()
+        weather_station_data: dict[str, list[float]] = {}
         for row in rows:
             left: str = ""
             right: str = ""
@@ -35,7 +21,7 @@ def parse_weather_station_data() -> None:
             city_name: str = left
             city_temperature: float = float(right)
             if weather_station_data.get(city_name) is None:
-                weather_station_data[city_name] = list()
+                weather_station_data[city_name] = []
                 weather_station_data[city_name].append(city_temperature)
             else:
                 weather_station_data[city_name].append(city_temperature)
@@ -46,8 +32,7 @@ def parse_weather_station_data() -> None:
         mean: float = -999.9
         minimum: float = -999.9
         maximum: float = -999.9
-        for key in weather_station_data.keys():
-            temperatures = weather_station_data[key]
+        for city_name, temperatures in weather_station_data.items():
             mean = sum(temperatures) / len(temperatures)
             minimum = min(temperatures)
             maximum = max(temperatures)
@@ -62,6 +47,7 @@ def parse_weather_station_data() -> None:
 
 
 def main() -> None:
+    """Call this function to run the program."""
     parse_weather_station_data()
 
 
