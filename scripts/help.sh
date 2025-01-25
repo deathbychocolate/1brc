@@ -62,9 +62,9 @@ _help_variables() {
 # Function to display examples
 _help_examples() {
     echo "Example(s):"
-    echo "  make"
     echo "  make help"
-    echo "  make test"
+    echo "  make run VERSION=v1"
+    echo "  make profile VERSION=v2"
 }
 
 # Call main function
