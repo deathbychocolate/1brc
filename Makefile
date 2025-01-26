@@ -2,17 +2,18 @@
 
 MAKEFILE_PATH := $(shell readlink -f Makefile)
 
-VERSION ?= v1## The version of the file we want to run (part of filename).
+VERSION ?= v1## The version of main.py we want to run.
+FILEPATH ?= 1brc/src/data/weather_stations.csv## The filepath of weather station data.
 
 .PHONY: run
-run: ## Run a 'main.py' file.
+run: ## Run main.py.
 	@echo "Running: 1brc/src/main_${VERSION}.py"
-	@python3 1brc/src/main_${VERSION}.py
+	@export FILEPATH=${FILEPATH} && python3 1brc/src/main_${VERSION}.py
 
 .PHONY: profile
-profile: ## Run a 'main.py' file with a profiler (Scalene).
+profile: ## Run main.py with a profiler (Scalene).
 	@echo "Running: 1brc/src/main_${VERSION}.py"
-	@python3 -m scalene 1brc/src/main_${VERSION}.py
+	@export FILEPATH=${FILEPATH} && python3 -m scalene 1brc/src/main_${VERSION}.py
 
 .PHONY: help
 help: ## Show help and exit.
