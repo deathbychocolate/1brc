@@ -1,12 +1,12 @@
 """The only file we will ever need."""
 
-from os import path
+from os import environ
 from timeit import timeit
 
 
 def parse_weather_station_data() -> None:  # this will likely take ~20 mins for 1 billion rows
     """This function holds all the logic we need."""
-    filepath: str = str(path.dirname(path.abspath(__file__))) + "/data/weather_stations.csv"
+    filepath: str = environ["FILEPATH"]
     with open(file=filepath, mode="r", encoding="utf8") as filepointer:
         rows: list[str] = filepointer.read().splitlines()
         rows = sorted(rows)  # sort with O(nlog(n)) algorithm
@@ -44,7 +44,7 @@ def parse_weather_station_data() -> None:  # this will likely take ~20 mins for 
         weather_station_data_processed = weather_station_data_processed.rstrip(", ")
         weather_station_data_processed += "}"
 
-        # print(weather_station_data_processed)
+        print(weather_station_data_processed)
 
 
 def main() -> None:
@@ -53,7 +53,7 @@ def main() -> None:
     wall_time_in_seconds: float = timeit(
         stmt="parse_weather_station_data()",
         setup="from main_v1 import parse_weather_station_data",
-        number=10_000,  # times we call the function
+        number=1,  # times we call the function
     )
     print(f"Wall time in seconds: {wall_time_in_seconds}")
 

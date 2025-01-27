@@ -1,6 +1,6 @@
 """The only file we will ever need."""
 
-from os import path
+from os import environ
 from timeit import timeit
 
 
@@ -12,7 +12,7 @@ def parse_weather_station_data() -> None:
     all temperatures accumulated.
     """
 
-    filepath: str = (str(path.dirname(path.abspath(__file__))) + "/data/weather_stations.csv")
+    filepath: str = environ["FILEPATH"]
     weather_station_data: dict[bytes, list[float]] = {}
     with open(file=filepath, mode="rb") as filepointer:
         for row in filepointer:
@@ -29,8 +29,7 @@ def parse_weather_station_data() -> None:
         for city_name, temperatures in weather_station_data.items()
     ]
     output: str = ", ".join(weather_station_data_per_city)
-
-    # print("{",output,"}")
+    print("{",output,"}", sep="")
 
 
 def main() -> None:
@@ -39,7 +38,7 @@ def main() -> None:
     wall_time_in_seconds: float = timeit(
         stmt="parse_weather_station_data()",
         setup="from main_v2 import parse_weather_station_data",
-        number=10_000,  # times we call the function
+        number=1,  # times we call the function
     )
     print(f"Wall time in seconds: {wall_time_in_seconds}")
 

@@ -27,16 +27,14 @@ def parse_weather_station_data() -> None:
         f"{city_name.decode()}={min(temperatures)}/{sum(temperatures) / len(temperatures)}/{max(temperatures)}"
         for city_name, temperatures in sorted(weather_station_data.items())
     ))
-    print("{", end="")
-    print(weather_station_data_per_city, end="")
-    print("}")
+    print("{",weather_station_data_per_city,"}", sep="")
 
 def main() -> None:
     """Call this function to run the program."""
     # parse_weather_station_data()
     wall_time_in_seconds: float = timeit(
         stmt="parse_weather_station_data()",
-        setup="from main_v2 import parse_weather_station_data",
+        setup="from main_v3 import parse_weather_station_data",
         number=1,  # times we call the function
     )
     print(f"Wall time in seconds: {wall_time_in_seconds}")

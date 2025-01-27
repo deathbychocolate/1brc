@@ -1,9 +1,10 @@
+include .env
+
 .DEFAULT_GOAL := help
 
 MAKEFILE_PATH := $(shell readlink -f Makefile)
-
-VERSION ?= v1## The version of main.py we want to run.
-FILEPATH ?= 1brc/src/data/weather_stations.csv## The filepath of weather station data.
+VERSION ?= ${VERSION}## The version of main.py we want to run (set in .env).
+FILEPATH ?= ${FILEPATH}## The filepath of weather station data (set in .env).
 
 .PHONY: run
 run: ## Run main.py.
