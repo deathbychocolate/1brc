@@ -14,7 +14,7 @@ run: ## Run main.py.
 
 .PHONY: profile
 profile: ## Run main.py with a profiler (Scalene).
-	@echo "Running: 1brc/src/main_${VERSION}.py on ${FILEPATH} with ${INTERPRETER} and Scalene."
+	@echo "Profiling: 1brc/src/main_${VERSION}.py on ${FILEPATH} with ${INTERPRETER}."
 	@export FILEPATH=${FILEPATH} && ${INTERPRETER} -m scalene 1brc/src/main_${VERSION}.py
 
 .PHONY: help
