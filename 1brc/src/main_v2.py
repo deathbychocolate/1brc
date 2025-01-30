@@ -14,8 +14,8 @@ def parse_weather_station_data() -> None:
 
     filepath: str = environ["FILEPATH"]
     weather_station_data: dict[bytes, list[float]] = {}
-    with open(file=filepath, mode="rb") as filepointer:
-        for row in filepointer:
+    with open(file=filepath, mode="rb") as fp:
+        for row in fp:
             city_name, city_temperature = row.split(b";")
             city_temperature = city_temperature.rstrip()
             if weather_station_data.get(city_name) is None:

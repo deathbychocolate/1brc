@@ -9,8 +9,8 @@ def parse_weather_station_data() -> (
 ):  # this will likely take ~20 mins for 1 billion rows
     """This function holds all the logic we need."""
     filepath: str = environ["FILEPATH"]
-    with open(file=filepath, mode="r", encoding="utf8") as filepointer:
-        rows: list[str] = filepointer.read().splitlines()
+    with open(file=filepath, mode="r", encoding="utf8") as fp:
+        rows: list[str] = fp.read().splitlines()
         rows = sorted(rows)  # sort with O(nlog(n)) algorithm
 
         # Construct a dictionary 'weather_station_data' so that we group all temps together by city.
