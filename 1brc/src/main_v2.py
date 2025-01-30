@@ -29,7 +29,7 @@ def parse_weather_station_data() -> None:
         for city_name, temperatures in weather_station_data.items()
     ]
     output: str = ", ".join(weather_station_data_per_city)
-    print("{",output,"}", sep="")
+    print("{", output, "}", sep="")
 
 
 def main() -> None:

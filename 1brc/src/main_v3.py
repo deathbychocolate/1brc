@@ -23,11 +23,14 @@ def parse_weather_station_data() -> None:
                 weather_station_data[city_name].append(float(city_temperature))
 
     # now that the data is organized, process it to get min, mean, and max values
-    weather_station_data_per_city: str = ', '.join((
-        f"{city_name.decode()}={min(temperatures)}/{sum(temperatures) / len(temperatures)}/{max(temperatures)}"
-        for city_name, temperatures in sorted(weather_station_data.items())
-    ))
-    print("{",weather_station_data_per_city,"}", sep="")
+    weather_station_data_per_city: str = ", ".join(
+        (
+            f"{city_name.decode()}={min(temperatures)}/{sum(temperatures) / len(temperatures)}/{max(temperatures)}"
+            for city_name, temperatures in sorted(weather_station_data.items())
+        )
+    )
+    print("{", weather_station_data_per_city, "}", sep="")
+
 
 def main() -> None:
     """Call this function to run the program."""

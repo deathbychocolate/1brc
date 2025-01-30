@@ -4,7 +4,9 @@ from os import environ
 from timeit import timeit
 
 
-def parse_weather_station_data() -> None:  # this will likely take ~20 mins for 1 billion rows
+def parse_weather_station_data() -> (
+    None
+):  # this will likely take ~20 mins for 1 billion rows
     """This function holds all the logic we need."""
     filepath: str = environ["FILEPATH"]
     with open(file=filepath, mode="r", encoding="utf8") as filepointer:
@@ -38,7 +40,10 @@ def parse_weather_station_data() -> None:  # this will likely take ~20 mins for 
             minimum = min(temperatures)
             maximum = max(temperatures)
             weather_station_data_processed += (
-                city_name + "=" + "/".join([str(minimum), str(mean), str(maximum)]) + ", "
+                city_name
+                + "="
+                + "/".join([str(minimum), str(mean), str(maximum)])
+                + ", "
             )
 
         weather_station_data_processed = weather_station_data_processed.rstrip(", ")
