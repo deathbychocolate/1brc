@@ -3,9 +3,9 @@ include .env
 .DEFAULT_GOAL := help
 
 MAKEFILE_PATH := $(shell readlink -f Makefile)
-VERSION ?= ${VERSION}## The version of main.py we want to run (set in .env).
-FILEPATH ?= ${FILEPATH}## The filepath of weather station data (set in .env).
-INTERPRETER ?= ${INTERPRETER}## The Python implementation of choice (set in .env) [python3|pypy3.10].
+VERSION ?= ${DEFAULT_VERSION}## The version of main.py we want to run (set in .env).
+FILEPATH ?= ${DEFAULT_FILEPATH}## The filepath of weather station data (set in .env).
+INTERPRETER ?= ${DEFAULT_INTERPRETER}## The interpreter of choice (set in .env) [python3|pypy3.10].
 
 .PHONY: run
 run: ## Run main.py.
