@@ -38,7 +38,7 @@ def main() -> None:
     # parse_weather_station_data()
     wall_time_in_seconds: float = timeit(
         stmt="parse_weather_station_data()",
-        setup="from main_v3_1 import parse_weather_station_data",
+        setup="from main_v3_2 import parse_weather_station_data",
         number=1,  # times we call the function
     )
     print(f"Wall time in seconds: {wall_time_in_seconds}")
