@@ -7,16 +7,17 @@ from timeit import timeit
 def parse_weather_station_data() -> None:
     """This function holds all the logic we need.
 
-    The thought was this algorithm would take about 20 mins
-    on my home system. In the end goes north of 40 mins until we `SIGINT` it.
-    Meaning, we decided the algorithm can not complete the task on a 13GB
+    The thought was this algorithm would take about `20 mins`
+    on my home system. In the end, it goes north of `40 mins` until we `SIGINT` it.
+    Meaning, we decided the algorithm can not complete the task on a `13GB`
     file. This is due to hitting our RAM limit.
 
-    The algorithm quickly goes from 13GB to 26GB without releasing the memory
-    to Heap. So, when we attempt to allocate another 13GB, it crawls to a halt.
-    The problem is we wanted to get a working algorithm first (which is correct),
-    without considering the size of the data.
-    Version `V2` makes many improvements in the areas of memory and compute time.
+    It seems that the algorithm quickly goes from `13GB` to `26GB` without releasing the memory
+    to Heap. So, when we attempt to allocate another `13GB`, it crawls to a halt.
+    The problem is this code was developed with goal of simply getting something working
+    against our `<50K row` file in `./data`. For any first iteration, this is the correct approach.
+
+    Version `v2` makes many improvements in the areas of memory and compute time.
     """
     filepath: str = environ["FILEPATH"]
     with open(file=filepath, mode="r", encoding="utf8") as fp:
