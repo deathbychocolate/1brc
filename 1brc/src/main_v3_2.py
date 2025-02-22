@@ -1,11 +1,10 @@
 """The only file we will ever need."""
 
-from os import environ
-from timeit import timeit
-from mmap import mmap, ACCESS_READ
 import multiprocessing
-from os import cpu_count
 import sys
+from mmap import ACCESS_READ, mmap
+from os import cpu_count, environ
+from timeit import timeit
 
 filepath: str = environ["FILEPATH"]
 
