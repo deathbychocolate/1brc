@@ -9,6 +9,27 @@ from timeit import timeit
 filepath: str = environ["FILEPATH"]
 
 
+def to_int(row: bytes) -> int:
+    # Parse sign
+    if row[0] == 45:  # ASCII for "-"
+        sign = -1
+        idx = 1
+    else:
+        sign = 1
+        idx = 0
+    # Check the position of the decimal point
+    if row[idx + 1] == 46:  # ASCII for "."
+        # -#.# or #.#
+        # 528 == ord("0") * 11
+        result = sign * ((row[idx] * 10 + row[idx + 2]) - 528)
+    else:
+        # -##.# or ##.#
+        # 5328 == ord("0") * 111
+        result = sign * ((row[idx] * 100 + row[idx + 1] * 10 + row[idx + 3]) - 5328)
+
+    return result
+
+
 def process_row(row: bytes, weather_station_data_chunk: dict[bytes, list]) -> None:
     """Processes each row of bytes in such that we avoid calling `mmap.mmap.readline()`
     and `list_object.append()`.
@@ -45,7 +66,7 @@ def process_row(row: bytes, weather_station_data_chunk: dict[bytes, list]) -> No
     index_delim: int = row.find(b";")
 
     city_name: bytes = row[:index_delim]  # up to but not including ';'
-    city_temperature: float = float(row[index_delim + 1 : -1])  # do not include ';' or '\n'.
+    city_temperature: int = to_int(row[index_delim + 1 : -1])  # do not include ';' or '\n'.
 
     if city_name in weather_station_data_chunk:
         occur_total_min_max = weather_station_data_chunk[city_name]
@@ -62,7 +83,7 @@ def process_row(row: bytes, weather_station_data_chunk: dict[bytes, list]) -> No
         ]
 
 
-def process_chunk(start_byte: int, end_byte: int) -> dict[bytes, list[float]]:
+def process_chunk(start_byte: int, end_byte: int) -> dict[bytes, list[int]]:
     """Distribute the work to the worker and process all rows from `start_byte`
     to `end_byte`.
 
@@ -73,7 +94,7 @@ def process_chunk(start_byte: int, end_byte: int) -> dict[bytes, list[float]]:
     Returns:
         dict[bytes, list[float]]: The now parsed data. The key is the `city_name`, the value is explained in `process_row()`.
     """
-    weather_station_data_chunk: dict[bytes, list[float]] = {}
+    weather_station_data_chunk: dict[bytes, list[int]] = {}
     with open(file=filepath, mode="rb") as fp:
         with mmap(fileno=fp.fileno(), length=end_byte, access=ACCESS_READ) as mfp:
             mfp.seek(start_byte)
@@ -83,17 +104,17 @@ def process_chunk(start_byte: int, end_byte: int) -> dict[bytes, list[float]]:
     return weather_station_data_chunk
 
 
-def reduce_chunks(weather_station_data_chunks: list[dict[bytes, list[float]]]) -> dict[bytes, list[float]]:
+def reduce_chunks(weather_station_data_chunks: list[dict[bytes, list[int]]]) -> dict[bytes, list[int]]:
     """Reduces the weather station chunks from being `1 list of dicts` to `1 dict`.
     This is needed in order for us to sort the solution later.
 
     Args:
-        weather_station_data_chunks (list[dict[bytes, list[float]]]): Our parsed weather station data.
+        weather_station_data_chunks (list[dict[bytes, list[int]]]): Our parsed weather station data.
 
     Returns:
-        dict[bytes, list[float]]: A reduced version of our `1 list of dicts`. It is now `1 dict`.
+        dict[bytes, list[int]]: A reduced version of our `1 list of dicts`. It is now `1 dict`.
     """
-    weather_station_data: dict[bytes, list[float]] = {}
+    weather_station_data: dict[bytes, list[int]] = {}
 
     for parsed_data in weather_station_data_chunks:
         for city_name, occur_total_min_max_from_chunks in parsed_data.items():
@@ -112,6 +133,16 @@ def reduce_chunks(weather_station_data_chunks: list[dict[bytes, list[float]]]) -
 def parse_weather_station_data() -> None:
     """This function has gotten much more complicated.
 
+    The only difference with this version and `v3_2` is we added a custom `to_int()` function.
+    The idea is floats in Python are expensive to do operations on. It would be much quicker
+    to process integers. And considering most solutions to the `1brc` challenge only have
+    `1` decimal point of accuracy, we can apply some trickery. And we only have to remember
+    to multiply the final result by `0.1` to convert back to a float.
+
+    I feel I should emphasize, full credit for `to_int()` goes to `Doug Mercer` who hosts the specific
+    solution here: `https://github.com/dougmercer-yt/1brc/blob/c408f597d4a559db398805a49b70e5cba351e099/src/doug_booty4.py#L9`
+
+    Thank you all for reading!
     """
 
     # Count number of cores. Must be int to continue.
@@ -135,17 +166,17 @@ def parse_weather_station_data() -> None:
                 offsets.append((start_byte, end_byte))
                 start_byte = end_byte
 
-    weather_station_data_chunks: list[dict[bytes, list[float]]] = []
+    weather_station_data_chunks: list[dict[bytes, list[int]]] = []
     with multiprocessing.Pool(processes=core_count) as pool:
         weather_station_data_chunks = pool.starmap(func=process_chunk, iterable=offsets)
 
     # reduce the data parsed by multiple workers from 1 list of dicts -> 1 dict
-    weather_station_data: dict[bytes, list[float]] = reduce_chunks(weather_station_data_chunks)
+    weather_station_data: dict[bytes, list[int]] = reduce_chunks(weather_station_data_chunks)
 
     # now that the data is organized, process it to get min, mean, and max values
     weather_station_data_per_city: str = ", ".join(
         (
-            f"{city_name.decode()}={occur_total_min_max[2]:.1f}/{(occur_total_min_max[1] / occur_total_min_max[0]):.1f}/{occur_total_min_max[3]:.1f}"
+            f"{city_name.decode()}={0.1*occur_total_min_max[2]:.1f}/{0.1*(occur_total_min_max[1] / occur_total_min_max[0]):.1f}/{0.1*occur_total_min_max[3]:.1f}"
             for city_name, occur_total_min_max in sorted(weather_station_data.items())
         )
     )
