@@ -7,9 +7,16 @@ from mmap import mmap, ACCESS_READ
 def parse_weather_station_data() -> None:
     """This function holds all the logic we need.
 
-    This function constructs a dictionary called 'weather_station_data'.
-    The dictionary groups all temps together by city name where each city has
-    all temperatures accumulated.
+    This one is where the really big changes start to appear.
+    We discover that there a package named `mmap`, which serves
+    as an API for memory mapping in Python.
+
+    Simply using an `mmap` pointer rather than the `open()` pointer,
+    gives us up to a `15% speedup` compared to `v2`.
+
+    At this point I felt confident enough that I was hitting the single
+    core optimization limit and need to start leveraging multicore solutions;
+    using this code as the foundation.
     """
 
     filepath: str = environ["FILEPATH"]
