@@ -9,16 +9,49 @@ import sys
 
 filepath: str = environ["FILEPATH"]
 
-def process_row(row: bytes, weather_station_data_chunk: dict) -> None:
+
+def process_row(row: bytes, weather_station_data_chunk: dict[bytes, list]) -> None:
+    """Processes each row of bytes in such that we avoid calling `mmap.mmap.readline()`
+    and `list_object.append()`.
+
+    This function is critical to this implementation working. Without it,
+    our only other option is to use built-in python `mmap.mmap.readline()`
+    or `list_object.append()`. Doing so with a multicore solution will consume **all** RAM
+    within the first `~10 seconds` of program execution. This in turn causes the execution
+    speed to slow to a crawl, returning us to the same set of issues in `v1`.
+
+    But by processing each row "manually", we make tremendous gains.
+
+    The rows processed here should look like the following:
+        Bloemfontein;-1.3
+        Austin;34.4
+        Baltimore;2.3
+        Bamako;19.7
+        Cairns;23.3
+        Pontianak;33.8
+        Los Angeles;24.2
+        Milan;25.0
+        Pontianak;11.0
+        Bratislava;2.4
+
+    Args:
+        row (bytes): A single row from the file containing the temperature data.
+        weather_station_data_chunk (dict[bytes, list]): Where we store the row after processing.
+            The key is the `city_name` and value is organized as follows:
+                - First  item [0]: Number of occurrences.         (we use this to calculate the avg)
+                - Second item [1]: Sum total of all temperatures. (we divide this item by the first)
+                - Third  item [2]: The minimum temperature found.
+                - Fourth item [3]: The maximum temperature found.
+    """
     index_delim: int = row.find(b";")
 
-    city_name: bytes = row[:index_delim]
+    city_name: bytes = row[:index_delim]  # up to but not including ';'
     city_temperature: float = float(row[index_delim + 1 : -1])  # do not include ';' or '\n'.
 
     if city_name in weather_station_data_chunk:
         occur_total_min_max = weather_station_data_chunk[city_name]
-        occur_total_min_max[0] += 1  # number of city occurrences
-        occur_total_min_max[1] += city_temperature  # total temp -> to generate avg temperature when by number of city occurrences.
+        occur_total_min_max[0] += 1  # number occurrences
+        occur_total_min_max[1] += city_temperature  # sum total temp
         occur_total_min_max[2] = min(occur_total_min_max[2], city_temperature)  # minimum temp found
         occur_total_min_max[3] = max(occur_total_min_max[3], city_temperature)  # maximum temp found
     else:  # initialize
@@ -31,11 +64,20 @@ def process_row(row: bytes, weather_station_data_chunk: dict) -> None:
 
 
 def process_chunk(start_byte: int, end_byte: int) -> dict[bytes, list[float]]:
+    """Distribute the work to the worker and process all rows from `start_byte`
+    to `end_byte`.
+
+    Args:
+        start_byte (int): Represents the beginning of the chunk.
+        end_byte (int): Represents the end of the chunk. Usually a `\n`.
+
+    Returns:
+        dict[bytes, list[float]]: The now parsed data. The key is the `city_name`, the value is explained in `process_row()`.
+    """
     weather_station_data_chunk: dict[bytes, list[float]] = {}
     with open(file=filepath, mode="rb") as fp:
         with mmap(fileno=fp.fileno(), length=end_byte, access=ACCESS_READ) as mfp:
             mfp.seek(start_byte)
-            print(f"Started work on byte range -> ({start_byte}, {end_byte})")
             for row in iter(mfp.readline, b""):
                 process_row(row, weather_station_data_chunk)
 
@@ -43,6 +85,15 @@ def process_chunk(start_byte: int, end_byte: int) -> dict[bytes, list[float]]:
 
 
 def reduce_chunks(weather_station_data_chunks: list[dict[bytes, list[float]]]) -> dict[bytes, list[float]]:
+    """Reduces the weather station chunks from being `1 list of dicts` to `1 dict`.
+    This is needed in order for us to sort the solution later.
+
+    Args:
+        weather_station_data_chunks (list[dict[bytes, list[float]]]): Our parsed weather station data.
+
+    Returns:
+        dict[bytes, list[float]]: A reduced version of our `1 list of dicts`. It is now `1 dict`.
+    """
     weather_station_data: dict[bytes, list[float]] = {}
 
     for parsed_data in weather_station_data_chunks:
@@ -60,11 +111,17 @@ def reduce_chunks(weather_station_data_chunks: list[dict[bytes, list[float]]]) -
 
 
 def parse_weather_station_data() -> None:
-    """This function holds all the logic we need.
+    """This function has gotten much more complicated.
 
-    This function constructs a dictionary called `weather_station_data`.
-    The dictionary groups all temps together by city name where each city has
-    all temperatures accumulated.
+    The principal is still the same. We need to parse data in a structured fashion in memory.
+    So, we still create a dictionary called `weather_station_data` that groups all temps together
+    by city name. But the values a much more different this time.
+
+    Because our last big addition to `v3_1` was using `mmap`, I wanted to build on that solution,
+    with finally implementing a mutlicore solution. This however had issues.
+    A multicore solution that continued to use `mmap.mmap.readline()` and `list_object.append()`
+    was unusable. We explain the details better in the related functions, but in short we had
+    RAM issues again.
     """
 
     # Count number of cores. Must be int to continue.
@@ -78,13 +135,13 @@ def parse_weather_station_data() -> None:
     offsets: list[tuple[int, int]] = []
     with open(filepath, mode="rb") as fp:
         with mmap(fileno=fp.fileno(), length=0, access=ACCESS_READ) as mfp:
-            length = len(mfp)
+            total_bytes = len(mfp)
             start_byte = mfp.tell()
-            bytes_per_core = len(mfp)//core_count
+            bytes_per_core = total_bytes // core_count
             for _ in range(core_count):
-                end_byte = min(start_byte + bytes_per_core, length)
+                end_byte = min(start_byte + bytes_per_core, total_bytes)
                 end_byte = mfp.find(b"\n", end_byte)
-                end_byte = end_byte + 1 if end_byte != -1 else length  # do not go beyond the actual size of the file
+                end_byte = end_byte + 1 if end_byte != -1 else total_bytes  # do not go beyond the actual size of the file
                 offsets.append((start_byte, end_byte))
                 start_byte = end_byte
 
@@ -93,7 +150,7 @@ def parse_weather_station_data() -> None:
         weather_station_data_chunks = pool.starmap(func=process_chunk, iterable=offsets)
 
     # reduce the data parsed by multiple workers from 1 list of dicts -> 1 dict
-    weather_station_data = reduce_chunks(weather_station_data_chunks)
+    weather_station_data: dict[bytes, list[float]] = reduce_chunks(weather_station_data_chunks)
 
     # now that the data is organized, process it to get min, mean, and max values
     weather_station_data_per_city: str = ", ".join(
