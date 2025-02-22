@@ -112,15 +112,17 @@ def reduce_chunks(weather_station_data_chunks: list[dict[bytes, list[float]]]) -
 def parse_weather_station_data() -> None:
     """This function has gotten much more complicated.
 
-    The principal is still the same. We need to parse data in a structured fashion in memory.
-    So, we still create a dictionary called `weather_station_data` that groups all temps together
-    by city name. But the values a much more different this time.
+    The principle is still the same. We need to parse data and store in a structured fashion
+    for just enough time in memory with just enough memory to process. So, we still create a
+    dictionary called `weather_station_data` that groups all temperatures together by `city_name`.
+    But the values tied to `city_name` are much more different this time.
 
-    Because our last big addition to `v3_1` was using `mmap`, I wanted to build on that solution,
-    with finally implementing a mutlicore solution. This however had issues.
-    A multicore solution that continued to use `mmap.mmap.readline()` and `list_object.append()`
-    was unusable. We explain the details better in the related functions, but in short we had
-    RAM issues again.
+    Because our last big addition to `v3_1` was using `mmap`, I wanted to build on that solution
+    by using my system's multiple cores. This however brought up some issues.
+
+    It seemed that a multicore solution that continued to use `mmap.mmap.readline()` and `list_object.append()`
+    in multiple processes was unusable. We explain the details better in the `process_row()` function,
+    but in short we had RAM issues again. There was no way around it. To fix it we had to do some byte arithmetic.
     """
 
     # Count number of cores. Must be int to continue.
