@@ -7,9 +7,13 @@ from timeit import timeit
 def parse_weather_station_data() -> None:
     """This function holds all the logic we need.
 
-    This function constructs a dictionary called 'weather_station_data'.
-    The dictionary groups all temps together by city name where each city has
-    all temperatures accumulated.
+    We have made significant improvements here compared to `v1`.
+    We will not include all of them here, in fact you are better off
+    doing a straight file diff with `v1`. But I will mention some:
+        - We have stopped creating new variables in loops.
+        - We have change the `open()` read mode from `r` to `rb`.
+        - We have removed some unnecessary variables thus freeing up memory.
+        - We are also a little bit smarter with joining the data.
     """
 
     filepath: str = environ["FILEPATH"]
@@ -25,8 +29,8 @@ def parse_weather_station_data() -> None:
 
     # now that the data is organized, process it to get min, mean, and max values
     weather_station_data_per_city = [
-        f"{city_name.decode()}={min(temperatures)}/{sum(temperatures) / len(temperatures)}/{max(temperatures)}"
-        for city_name, temperatures in weather_station_data.items()
+        f"{city_name.decode()}={min(temperatures):.1f}/{sum(temperatures) / len(temperatures):.1f}/{max(temperatures):.1f}"
+        for city_name, temperatures in sorted(weather_station_data.items())
     ]
     output: str = ", ".join(weather_station_data_per_city)
     print("{", output, "}", sep="")
