@@ -7,9 +7,19 @@ from timeit import timeit
 def parse_weather_station_data() -> None:
     """This function holds all the logic we need.
 
-    This function constructs a dictionary called 'weather_station_data'.
-    The dictionary groups all temps together by city name where each city has
-    all temperatures accumulated.
+    The differences between this file and `v2` are small but important.
+    We have optimized the loop a little by removing the need for the extra
+    use of `city_temperature`, and we switch out the `list comprehension` to
+    using a combination of `join()` and a `generator comprehension`.
+    The generator, especially, made a significant difference.
+
+    Memory usage by these algorithms is still very high (averaging at a little over `23GB`),
+    but Python's generators make the operations from `sorted()` to have a much smaller effect
+    on memory compared to a list comprehension. In my case, I notices there is a steady and
+    incremental increase in memory usage  up to `23GB` (via `activity monitor`) rather than a
+    sharp increase to `23GB` that the list comprehension has.
+
+    I am uncertain if this improvement will be as impactful on other systems.
     """
 
     filepath: str = environ["FILEPATH"]
