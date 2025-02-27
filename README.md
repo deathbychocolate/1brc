@@ -1,14 +1,19 @@
 # 1brc
 Welcome to the 1 billion row challenge!
 
-This attempt at the 1brc was inspired by the creator and coordinator of the challenge [@gunnarmorling](https://github.com/gunnarmorling/), and by the attempt from [@dougmercer-yt](https://github.com/dougmercer-yt/).  I decided to give it a shot myself as an opportunity to learn about Python.
+This attempt at the 1brc was inspired by the creator and coordinator of the challenge [@gunnarmorling](https://github.com/gunnarmorling/), and by the attempt from [@dougmercer-yt](https://github.com/dougmercer-yt/).
 
 ## Challenge Description:
 This is the challenge description as extracted from the original repo. The repo is listed in the 'Relevant links' section.
 > The task is to write a ~~Java~~ Python program which reads the file, calculates the min, mean, and max temperature value per weather station, and emits the results on stdout like this (i.e. sorted alphabetically by station name, and the result values per station in the format `<min>/<mean>/<max>`, rounded to one fractional digit):  
 ```{Abha=-23.0/18.0/59.2, Abidjan=-16.2/26.0/67.3, Abéché=-10.0/29.4/69.0, Accra=-10.1/26.4/66.4, Addis Ababa=-23.7/16.0/67.0, Adelaide=-27.8/17.3/58.5, ...}```
 
-## Does this match my needs?
+## Why can you learn from this repo?
+You can expect to learn how to push pure Python implementations to their limit. You will definitely learn something if you have a situation similar to `1brc`:
+- You have a very large file (`13GB` or more) stored on disk.
+- The file is ready to process (no major transformations needed).
+- You need to optimize using Python's multiprocessing module but are not getting expected results.
+- You do not have the ability to use third party libraries (such as `Pandas` or `Polars`).
 
 ## Challenge Summary Report:
 The following context is needed to understand the report completely:
@@ -55,7 +60,6 @@ If you prefer to copy paste commands, here are a few examples:
 `make run`  
 `make profile`  
 `make run FILEPATH=measurements.txt VERSION=v1 INTERPRETER=python3`  
-`make run FILEPATH=measurements.txt VERSION=v1 INTERPRETER=python3`  
 `make run FILEPATH=measurements.txt VERSION=v2 INTERPRETER=python3`  
 `make run FILEPATH=measurements.txt VERSION=v3 INTERPRETER=pypy3.10`  
 `make run FILEPATH=measurements.txt VERSION=v3_1 INTERPRETER=pypy3.10`  
@@ -67,5 +71,5 @@ Please note:
 - Profiling uses `Scalene`, which is built to work with `CPython` only. As such, use `INTERPRETER=python3` for `make profile`. The same applies to `Pandas` and `Polars`.
 
 ## Relevant links:
-- The main repo with Java implemented solutions: `https://github.com/gunnarmorling/1brc`
-- The main repo with Java implemented solutions (blogs): `https://github.com/gunnarmorling/1brc?tab=readme-ov-file#1brc-on-the-web`
+- The main repo with Java implemented solutions: [https://github.com/gunnarmorling/1brc](https://github.com/gunnarmorling/1brc)
+- The main repo with Java implemented solutions (blogs): [https://github.com/gunnarmorling/1brc?tab=readme-ov-file#1brc-on-the-web](https://github.com/gunnarmorling/1brc?tab=readme-ov-file#1brc-on-the-web)
