@@ -12,7 +12,7 @@ def parse_weather_station_data() -> None:
     as an API for memory mapping in Python.
 
     Simply using an `mmap` pointer rather than the `open()` pointer,
-    gives us up to a `15% speedup` compared to `v2`.
+    gives us up to a `15% speedup` compared to `v3`.
 
     At this point I felt confident enough that I was hitting the single
     core optimization limit and need to start leveraging multicore solutions;

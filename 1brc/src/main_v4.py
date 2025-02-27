@@ -18,7 +18,7 @@ def parse_weather_station_data() -> None:
     """This function holds all the logic we need.
 
     We hoped to make some performance gains by removing the need of `sorted()`.
-    But we ended up creating a slower algorithm than `V3` likely due to using list `inserts`.
+    But we ended up creating a slower algorithm than `v3` likely due to using list `inserts`.
 
     In detail, we construct 2 variables; `weather_station_names` and `weather_station_temps`.
     They are lists that accept inserts of weather station data.

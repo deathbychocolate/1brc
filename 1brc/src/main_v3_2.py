@@ -14,10 +14,11 @@ def process_row(row: bytes, weather_station_data_chunk: dict[bytes, list]) -> No
     and `list_object.append()`.
 
     This function is critical to this implementation working. Without it,
-    our only other option is to use built-in python `mmap.mmap.readline()`
-    or `list_object.append()`. Doing so with a multicore solution will consume **all** RAM
-    within the first `~10 seconds` of program execution. This in turn causes the execution
-    speed to slow to a crawl, returning us to the same set of issues in `v1`.
+    our only other option is to use built-in python `mmap.mmap.readline()`,
+    use `list_object.append()`, and creating Python objects in general; an expensive process.
+    Doing so with a multicore solution will consume **all** RAM within the first `~10 seconds`
+    of program execution. This in turn causes the execution speed to slow to a crawl, returning
+    us to the same set of issues in `v1`.
 
     But by processing each row "manually", we make tremendous gains.
 
